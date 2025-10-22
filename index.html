@@ -1,0 +1,236 @@
+<?php
+// Register the shortcode [ai_cost_calculator]
+add_shortcode('ai_cost_calculator', 'ai_cost_calculator_shortcode');
+
+function ai_cost_calculator_shortcode() {
+    ob_start();
+    ?>
+
+    <!-- =================================================================
+    == AI AGENT COST CALCULATOR HTML STRUCTURE
+    ================================================================== -->
+    <div id="ai-cost-calculator-app">
+        <div class="calculator-container">
+            <div class="calculator-logo">
+                <img src="https://50153138.fs1.hubspotusercontent-na1.net/hubfs/50153138/Sails/Sails/logo-1-1.png?width=430&t=1757061636481" alt="Sails Software Logo">
+            </div>
+            <h1 class="main-title">AI Agent Cost Calculator</h1>
+            <p class="sub-title">Decision-tree based model selection &nbsp;&bull;&nbsp; Architecture-aware costs &nbsp;&bull;&nbsp; Cost optimization toggles</p>
+            
+            <div class="calculator-grid">
+                <!-- Left Column -->
+                <div class="column">
+                    <div class="calc-section">
+                        <h2 class="section-title">Task Profile</h2>
+                        <div class="input-group">
+                            <label for="complexity">Complexity</label>
+                            <select id="complexity"><option value="simple">Simple</option><option value="moderate">Moderate</option><option value="complex">Complex</option></select>
+                        </div>
+                        <div class="input-group"><label>Requires complex reasoning</label><div><input type="checkbox" id="requires-reasoning" class="toggle-switch"><small>Enable if tasks need deliberate multi-step reasoning.</small></div></div>
+                        <div class="input-group">
+                            <label for="context-size">Context Size</label>
+                            <select id="context-size"><option value="short">Short (≤8K)</option><option value="medium">Medium (32-128K)</option><option value="long">Long (≥200K)</option></select>
+                        </div>
+                        <div class="input-group">
+                            <label for="budget-sensitivity">Budget Sensitivity</label>
+                            <select id="budget-sensitivity"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+                        </div>
+                    </div>
+
+                    <div class="calc-section">
+                        <h2 class="section-title">Model Decision Tree</h2>
+                        <div class="input-group">
+                            <label for="override-model">Override (optional)</label>
+                            <select id="override-model"><option value="none">-- No Override --</option><option value="gpt-3.5-turbo">GPT-3.5-turbo (example)</option><option value="claude-3-haiku">Claude 3 Haiku (example)</option><option value="claude-3-sonnet">Claude 3 Sonnet (example)</option><option value="gpt-4">GPT-4 (example)</option></select>
+                        </div>
+                        <div class="input-group"><label>Model routing</label><div><input type="checkbox" id="model-routing" class="toggle-switch" checked><small>Route simple vs complex examples to premium models.</small></div></div>
+                        <div class="input-group half"><label for="primary-model">Primary model (simple tasks)</label><select id="primary-model"><option value="gpt-3.5-turbo">GPT-3.5-turbo (example)</option><option value="claude-3-haiku">Claude 3 Haiku (example)</option><option value="claude-3-sonnet">Claude 3 Sonnet (example)</option><option value="gpt-4">GPT-4 (example)</option></select></div>
+                        <div class="input-group half"><label for="secondary-model">Secondary model (complex tasks)</label><select id="secondary-model"><option value="gpt-4">GPT-4 (example)</option><option value="gpt-3.5-turbo">GPT-3.5-turbo (example)</option><option value="claude-3-haiku">Claude 3 Haiku (example)</option><option value="claude-3-sonnet">Claude 3 Sonnet (example)</option></select></div>
+                        <div class="input-group"><label for="primary-share">Primary routing share</label><div class="slider-container"><input type="range" id="primary-share" min="0" max="100" value="80"><span class="slider-value" id="primary-share-value">80% primary</span></div></div>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h2 class="section-title">Optimizations</h2>
+                        <div class="input-group"><label>Enable response caching</label><div class="slider-container"><input type="range" id="caching-savings" min="0" max="100" value="25"><span class="slider-value" id="caching-savings-value">25%</span></div></div>
+                        <div class="input-group"><label>Enable prompt optimization</label><div class="slider-container"><input type="range" id="prompt-savings" min="0" max="100" value="15"><span class="slider-value" id="prompt-savings-value">15%</span></div></div>
+                        <div class="input-group"><label>Monitoring & alerts</label><div><input type="checkbox" id="token-alerts" class="toggle-switch"><small>Alert when tokens per interaction exceed a threshold.</small></div></div>
+                    </div>
+                    
+                    <div class="calc-section recommended-box"><h3 class="recommended-title">Recommended:</h3><p id="recommendation-text"></p></div>
+                </div>
+
+                <div class="column">
+                    <div class="calc-section"><h2 class="section-title">Usage & Context</h2><div class="input-group"><label for="interactions">Interactions / month</label><input type="number" id="interactions" value="10000"></div><div class="input-group"><label for="avg-tokens">Avg tokens / interaction</label><input type="number" id="avg-tokens" value="800"></div><div class="input-group"><label for="tokens-after-opt">Tokens after optimisation</label><input type="number" id="tokens-after-opt" value="510" disabled></div><div class="input-group"><label for="headcount">Headcount (for onboarding)</label><input type="number" id="headcount" value="200"></div></div>
+                    <div class="calc-section"><h2 class="section-title">Architecture</h2><div class="input-group"><label for="architecture-preset">Preset</label><select id="architecture-preset"><option value="resolution-agent">Resolution Agent</option><option value="custom">Custom</option></select></div><div class="input-group"><label for="fixed-price">Fixed price (£/mo)</label><input type="number" id="fixed-price" value="519.00"></div><div class="input-group"><label for="variable-price">Variable price (£/mo)</label><input type="number" id="variable-price" value="200.00"></div><div class="input-group"><label>Autoscaling</label><div><input type="checkbox" id="auto-scaling" class="toggle-switch"><small>Flexible (+10% variable savings)</small></div></div></div>
+                    <div class="calc-section">
+                         <h2 class="section-title">Model Pricing (Editable)</h2>
+                        <div class="pricing-grid"><div class="header">Model</div><div class="header">$/1k tokens</div><div class="model-name">GPT-3.5-turbo</div><input type="number" step="0.0001" class="price-input" data-model="gpt-3.5-turbo" value="0.0007"><div class="model-name">Claude 3 Haiku</div><input type="number" step="0.0001" class="price-input" data-model="claude-3-haiku" value="0.00075"><div class="model-name">Claude 3 Sonnet</div><input type="number" step="0.0001" class="price-input" data-model="claude-3-sonnet" value="0.009"><div class="model-name">GPT-4</div><input type="number" step="0.001" class="price-input" data-model="gpt-4" value="0.02"></div>
+                        <div class="output-grid"><div class="output-box"><label>Blended price ($ / 1k tokens)</label><span id="blended-price"></span></div><div class="output-box"><label>Monthly tokens</label><span id="monthly-tokens"></span></div></div>
+                    </div>
+                    <div class="calc-section">
+                        <h2 class="section-title">Commercials</h2>
+                        <div class="output-grid"><div class="output-box"><label>Platform fee (£/mo)</label><input type="number" class="inline-input" id="platform-fee" value="1500"></div><div class="output-box"><label>Support % (of arch + model)</label><input type="number" class="inline-input" id="support-percent" value="0.15"></div></div>
+                        <div class="output-grid"><div class="output-box"><label>Variable (after autoscale)</label><span id="variable-total"></span></div><div class="output-box"><label>Cloud cost (infra + model)</label><span id="cloud-cost"></span></div><div class="output-box"><label>Support fee</label><span id="support-fee"></span></div><div class="output-box total"><label>Total monthly</label><span id="total-monthly"></span></div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calculator-actions">
+                <button type="button" class="action-btn btn-secondary" id="save-json-btn">Save JSON</button>
+                <a href="https://sailssoftware.com/contact-us/" target="_blank" class="action-btn btn-primary">Get Estimation</a>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        #ai-cost-calculator-app {
+            --sails-dark-blue: #064a70;
+            --sails-accent-blue: #00b9ff;
+            --light-blue-bg: #f0f9ff;
+            --border-color: #dce4e8;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+
+            background-color: #f8f9fa;
+            padding: 40px 20px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .calculator-container { max-width: 1400px; margin: 0 auto; }
+        .calculator-logo { text-align: center; margin-bottom: 25px; }
+        .calculator-logo img { max-width: 200px; height: auto; }
+        .main-title { text-align: center; font-size: 28px; margin-bottom: 8px; color: var(--sails-dark-blue); }
+        .sub-title { text-align: center; font-size: 14px; color: var(--text-secondary); margin-bottom: 40px; }
+        .calculator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .column { display: flex; flex-direction: column; gap: 25px; }
+        .calc-section { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 25px; }
+        .section-title { font-size: 14px; font-weight: bold; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 0.5px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--sails-dark-blue); }
+        .input-group small { font-size: 12px; color: #95a5a6; }
+        .input-group > div { display: flex; align-items: center; gap: 10px; }
+        input[type="number"], select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; transition: border-color 0.2s, box-shadow 0.2s; }
+        input[type="number"]:focus, select:focus { outline: none; border-color: var(--sails-accent-blue); box-shadow: 0 0 0 3px rgba(0, 185, 255, 0.15); }
+        input[type="number"][disabled] { background-color: #f8f9fa; }
+        input[type="checkbox"].toggle-switch { -webkit-appearance: none; appearance: none; width: 40px; height: 24px; background: #ccc; border-radius: 24px; position: relative; cursor: pointer; transition: background-color 0.3s; }
+        input[type="checkbox"].toggle-switch::before { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.3s; }
+        input[type="checkbox"].toggle-switch:checked { background: var(--sails-accent-blue); }
+        input[type="checkbox"].toggle-switch:checked::before { transform: translateX(16px); }
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: var(--sails-accent-blue); cursor: pointer; border-radius: 50%; }
+        .slider-value { font-size: 13px; font-weight: 500; color: var(--sails-accent-blue); min-width: 80px; text-align: right; }
+        .recommended-box { background-color: var(--light-blue-bg); border: 1px solid var(--sails-accent-blue); }
+        .recommended-title { font-weight: 600; font-size: 14px; color: var(--sails-dark-blue); margin-bottom: 5px; }
+        #recommendation-text { font-size: 13px; color: var(--sails-dark-blue); }
+        .pricing-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 10px 15px; align-items: center; margin-bottom: 25px; }
+        .pricing-grid .header { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+        .model-name { font-size: 14px; color: var(--text-primary); }
+        .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .output-box { background-color: #f8f9fa; border-radius: 6px; padding: 15px; }
+        .output-box label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; }
+        .output-box span, .output-box input.inline-input { display: block; font-size: 18px; font-weight: 600; color: var(--sails-dark-blue); }
+        .output-box input.inline-input { padding: 0; border: none; background: none; width: 100%; }
+        .output-box.total { background-color: var(--light-blue-bg); }
+        .output-box.total label { color: var(--sails-dark-blue); }
+        .output-box.total span { color: var(--sails-dark-blue); font-size: 20px; }
+        .calculator-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+        .action-btn { padding: 10px 20px; font-size: 14px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; transition: all 0.3s ease; text-decoration: none; text-align: center; }
+        .btn-primary { background-color: var(--sails-accent-blue); color: white; border: 1px solid var(--sails-accent-blue); }
+        .btn-primary:hover { background-color: #0099cc; }
+        .btn-secondary { background-color: white; color: var(--sails-dark-blue); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background-color: #f8f9fa; border-color: #adb5bd; }
+        .input-group.half { width: calc(50% - 10px); display: inline-block; vertical-align: top; }
+        .input-group.half:nth-child(even){ margin-left: 20px; }
+        @media (max-width: 1200px) { .calculator-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .input-group.half { width: 100%; display: block; margin-left: 0 !important; } }
+    </style>
+
+    <script>
+         document.addEventListener('DOMContentLoaded', () => {
+            const gbpToUsdRate = 1.27;
+            const elements = {
+                interactions: document.getElementById('interactions'), avgTokens: document.getElementById('avg-tokens'),
+                cachingSavings: document.getElementById('caching-savings'), promptSavings: document.getElementById('prompt-savings'),
+                tokensAfterOpt: document.getElementById('tokens-after-opt'), primaryShare: document.getElementById('primary-share'),
+                primaryShareValue: document.getElementById('primary-share-value'), cachingSavingsValue: document.getElementById('caching-savings-value'),
+                promptSavingsValue: document.getElementById('prompt-savings-value'), overrideModel: document.getElementById('override-model'),
+                primaryModel: document.getElementById('primary-model'), secondaryModel: document.getElementById('secondary-model'),
+                modelRouting: document.getElementById('model-routing'), autoScaling: document.getElementById('auto-scaling'),
+                fixedPrice: document.getElementById('fixed-price'), variablePrice: document.getElementById('variable-price'),
+                platformFee: document.getElementById('platform-fee'), supportPercent: document.getElementById('support-percent'),
+                complexity: document.getElementById('complexity'), requiresReasoning: document.getElementById('requires-reasoning'),
+                contextSize: document.getElementById('context-size'), budgetSensitivity: document.getElementById('budget-sensitivity'),
+                recommendationText: document.getElementById('recommendation-text'), priceInputs: document.querySelectorAll('.price-input'),
+                blendedPrice: document.getElementById('blended-price'), monthlyTokens: document.getElementById('monthly-tokens'),
+                variableTotal: document.getElementById('variable-total'), cloudCost: document.getElementById('cloud-cost'),
+                supportFee: document.getElementById('support-fee'), totalMonthly: document.getElementById('total-monthly'),
+                saveJsonBtn: document.getElementById('save-json-btn')
+            };
+
+            const calculateCosts = () => {
+                const optimizedTokens = (parseFloat(elements.avgTokens.value) * (1 - parseFloat(elements.cachingSavings.value)/100)) * (1 - parseFloat(elements.promptSavings.value)/100);
+                elements.tokensAfterOpt.value = Math.round(optimizedTokens);
+                const totalMonthlyTokens = parseFloat(elements.interactions.value) * optimizedTokens;
+                let blendedPricePer1k;
+                const getAvgPrice = (modelKey) => parseFloat(document.querySelector(`.price-input[data-model="${modelKey}"]`).value);
+                
+                if (elements.overrideModel.value !== 'none') { blendedPricePer1k = getAvgPrice(elements.overrideModel.value); }
+                else if (elements.modelRouting.checked) {
+                    const primaryShare = parseFloat(elements.primaryShare.value) / 100;
+                    blendedPricePer1k = (getAvgPrice(elements.primaryModel.value) * primaryShare) + (getAvgPrice(elements.secondaryModel.value) * (1 - primaryShare));
+                } else { blendedPricePer1k = getAvgPrice(elements.primaryModel.value); }
+                
+                const finalModelSpendUSD = (totalMonthlyTokens / 1000) * blendedPricePer1k;
+                let variablePriceGBP = parseFloat(elements.variablePrice.value);
+                if(elements.autoScaling.checked) variablePriceGBP *= 0.90;
+                
+                const cloudCost = (parseFloat(elements.fixedPrice.value) + variablePriceGBP) + (finalModelSpendUSD / gbpToUsdRate);
+                const platformFeeGBP = parseFloat(elements.platformFee.value);
+                const supportFee = (cloudCost + platformFeeGBP) * parseFloat(elements.supportPercent.value);
+                const totalMonthly = platformFeeGBP + cloudCost + supportFee;
+
+                elements.blendedPrice.textContent = `$${blendedPricePer1k.toFixed(4)}`;
+                elements.monthlyTokens.textContent = totalMonthlyTokens.toLocaleString();
+                elements.variableTotal.textContent = `£${variablePriceGBP.toFixed(2)}`;
+                elements.cloudCost.textContent = `£${cloudCost.toFixed(2)}`;
+                elements.supportFee.textContent = `£${supportFee.toFixed(2)}`;
+                elements.totalMonthly.textContent = `£${totalMonthly.toFixed(2)}`;
+                updateRecommendation();
+            };
+            
+            const updateRecommendation = () => {
+                 let model = "GPT 3.5 Turbo";
+                 if(elements.requiresReasoning.checked || elements.complexity.value === 'complex') { model = "GPT-4"; }
+                 if(elements.budgetSensitivity.value === 'high' && !elements.requiresReasoning.checked) { model = "Claude 3 Haiku"; }
+                 elements.recommendationText.textContent = `${model} (Reasoning: ${elements.requiresReasoning.checked ? 'Yes':'No'} - Complexity: ${elements.complexity.value} - Budget: ${elements.budgetSensitivity.value})`;
+            };
+
+            document.querySelectorAll('#ai-cost-calculator-app input, #ai-cost-calculator-app select').forEach(i => i.addEventListener('input', calculateCosts));
+            const setupSlider = (s, v, x) => s.addEventListener('input', () => v.textContent = `${s.value}${x}`);
+            setupSlider(elements.primaryShare, elements.primaryShareValue, '% primary');
+            setupSlider(elements.cachingSavings, elements.cachingSavingsValue, '%');
+            setupSlider(elements.promptSavings, elements.promptSavingsValue, '%');
+
+            elements.saveJsonBtn.addEventListener('click', () => {
+                const settings = {};
+                for (const key in elements) {
+                     if (elements[key] && elements[key].id && (elements[key].value !== undefined || elements[key].checked !== undefined)) {
+                         settings[elements[key].id] = elements[key].type === 'checkbox' ? elements[key].checked : elements[key].value;
+                    }
+                }
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(settings, null, 2));
+                const dl = document.createElement('a');
+                dl.setAttribute("href", dataStr);
+                dl.setAttribute("download", "ai_agent_settings.json");
+                dl.click();
+                dl.remove();
+            });
+            
+            calculateCosts();
+        });
+    </script>
+    
+    <?php
+    return ob_get_clean();
+}
+?>
